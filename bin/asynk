@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/asynk/cli'
+
+begin
+  cli = Asynk::CLI.instance
+  cli.run
+rescue => e
+  STDERR.puts e.message
+  STDERR.puts e.backtrace.join("\n")
+  exit 1
+end

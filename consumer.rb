@@ -10,11 +10,11 @@ class Worker
   def initialize(conn)
     @ch = conn.create_channel
     q = @ch.queue('task_queue', :durable => true)
-    q.subscribe manual_ack: true, &method(:on_subscribe)
+    q.subscribe manual_ack: true, &method(:on_event)
     p 'worker accepting connections'
   end
 
-  def on_subscribe(delivery_info, properties, body)
+  def on_event(delivery_info, properties, body)
     p "#{Time.now.strftime('%FT %T.%L')} started work: #{body}"
     sleep(10)
     p "#{Time.now.strftime('%FT %T.%L')} completed work: #{body}"

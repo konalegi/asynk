@@ -8,13 +8,15 @@ Gem::Specification.new do |gem|
   gem.description   = "Async/sync inter sevrer communication based on RabbitMQ"
   gem.license       = "LGPL-3.0"
 
-  gem.executables   = ['asynk']
-  gem.files         = `git ls-files | grep -Ev`.split("\n")
-  gem.test_files    = `git ls-files -- test/*`.split("\n")
+  gem.files         = `git ls-files -z`.split("\x0")
+  gem.executables   = gem.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "asynk"
   gem.require_paths = ["lib"]
   gem.version       = Asynk::VERSION
   gem.add_dependency                  'celluloid', '~> 0.17.0'
+  gem.add_dependency                  'celluloid-io'
+  gem.add_dependency                  'activesupport'
   gem.add_dependency                  'json', '~> 1.0'
   gem.add_dependency                  'bunny'
   gem.add_development_dependency      'minitest', '~> 5.7', '>= 5.7.0'

@@ -1,9 +1,9 @@
 $stdout.sync = true
+
 require 'optparse'
 require 'fileutils'
 require 'singleton'
 require 'asynk'
-
 module Asynk
   class CLI
     include Singleton
@@ -12,6 +12,7 @@ module Asynk
     def run(args=ARGV)
       setup_options(args)
       boot_system
+      Asynk.server.run
     end
 
     private
@@ -26,6 +27,7 @@ module Asynk
       end
 
       def boot_system
+        Asynk.logger.info 'Booting rails app'
         ENV['RACK_ENV'] = ENV['RAILS_ENV'] = environment
 
         raise ArgumentError, "#{options[:require]} does not exist" unless File.exist?(options[:require])
@@ -33,6 +35,7 @@ module Asynk
         if File.directory?(options[:require])
           require File.expand_path("#{options[:require]}/config/application.rb")
           require File.expand_path("#{options[:require]}/config/environment.rb")
+          ::Rails.application.eager_load!
         else
           require options[:require]
         end

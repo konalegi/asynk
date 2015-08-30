@@ -13,6 +13,7 @@ module Asynk
       end
 
       def sync_publish(routing_key, params = {})
+        wait_timeout = params.delete(:timeout) || Asynk.config[:sync_publish_wait_timeout]
         load_cellulooid
         conn = Asynk.broker.amqp_connection
         ch   = conn.create_channel
@@ -27,7 +28,7 @@ module Asynk
         end
 
         x.publish(params.to_json, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
-        Asynk::Response.try_to_create_from_hash(condition.wait)
+        Asynk::Response.try_to_create_from_hash(condition.wait(wait_timeout))
       ensure
         ch.close if ch
       end

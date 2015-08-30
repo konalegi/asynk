@@ -3,7 +3,8 @@ module Asynk
     include Singleton
     def initialize
       @params = {
-        mq_exchange: 'asynk_exchange_topic'
+        mq_exchange: 'asynk_exchange_topic',
+        sync_publish_wait_timeout: 10
       }
     end
 

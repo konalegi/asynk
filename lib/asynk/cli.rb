@@ -125,7 +125,6 @@ module Asynk
         end
 
         @parser.parse!(argv)
-        # opts[:config_file] ||= 'config/sidekiq.yml' if File.exist?('config/sidekiq.yml')
         opts
       end
   end

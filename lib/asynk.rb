@@ -11,6 +11,7 @@ require 'asynk/logger'
 require 'asynk/server'
 require 'asynk/worker'
 require 'asynk/message'
+require 'asynk/response'
 
 module Asynk
   DEFAULTS = {

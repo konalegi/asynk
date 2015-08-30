@@ -27,7 +27,7 @@ module Asynk
     end
 
     module ClassMethods
-      attr_reader :concurrency, :routing_keys, :queue_name, :subscribe_arguments, :queue_options
+      attr_reader :routing_keys, :queue_name, :subscribe_arguments, :queue_options
 
       # Add one or more routing keys to the set of routing keys the consumer
       # wants to subscribe to.
@@ -50,12 +50,16 @@ module Asynk
         @concurrency = size
       end
 
+      def concurrency
+        @concurrency || Asynk.config[:default_consumer_concurrency]
+      end
+
       def set_sync(sync)
         @sync = sync
       end
 
       def sync?
-        @sync || false
+        @sync || Asynk.config[:default_sync]
       end
 
     end

@@ -31,6 +31,7 @@ module Asynk
       result = consumer_instance.process(message)
       if @consumer.sync?
         Asynk.logger.debug "Sending message back: #{result}"
+        result = Asynk::Response.new(status: :ok, body: result) unless result.kind_of?(Asynk::Response)
         @default_exchange.publish(result.to_json, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
       end
     end

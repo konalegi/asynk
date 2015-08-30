@@ -2,7 +2,6 @@ $stdout.sync = true
 
 require 'optparse'
 require 'fileutils'
-require 'singleton'
 require 'asynk'
 module Asynk
   class CLI
@@ -12,10 +11,60 @@ module Asynk
     def run(args=ARGV)
       setup_options(args)
       boot_system
+      daemonize
+      load_celluloid
+      write_pid
       Asynk.server.run
     end
 
     private
+
+      def load_celluloid
+        require 'celluloid'
+        require 'celluloid/io'
+      end
+
+      def daemonize
+        return unless options[:daemon]
+
+        raise ArgumentError, "You really should set a logfile if you're going to daemonize" unless options[:logfile]
+        # files_to_reopen = []
+        # ObjectSpace.each_object(File) do |file|
+        #   files_to_reopen << file unless file.closed?
+        # end
+
+        ::Process.daemon(true, true)
+
+        # files_to_reopen.each do |file|
+        #   begin
+        #     file.reopen file.path, "a+"
+        #     file.sync = true
+        #   rescue ::Exception
+        #   end
+        # end
+
+        [$stdout, $stderr].each do |io|
+          File.open(options[:logfile], 'ab') do |f|
+            io.reopen(f)
+          end
+          io.sync = true
+        end
+        $stdin.reopen('/dev/null')
+
+        # initialize_logger
+      end
+
+      def write_pid
+        if path = options[:pidfile]
+          pidfile = File.expand_path(path)
+          File.open(pidfile, 'w') do |f|
+            f.puts ::Process.pid
+          end
+        end
+      end
+
+
+
       def options
         Asynk.options
       end

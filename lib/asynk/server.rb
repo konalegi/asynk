@@ -6,6 +6,7 @@ module Asynk
     end
 
     def run
+      require 'asynk/worker'
       prepare_consumers
       register_signal_handlers
       Asynk.logger.info "All consumers are prepared"

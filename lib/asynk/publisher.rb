@@ -13,6 +13,7 @@ module Asynk
       end
 
       def sync_publish(routing_key, params = {})
+        load_cellulooid
         conn = Asynk.broker.amqp_connection
         ch   = conn.create_channel
         x    = ch.topic(Asynk.config[:mq_exchange])
@@ -26,7 +27,14 @@ module Asynk
         end
 
         x.publish(params.to_json, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
-        condition.wait
+        Asynk::Response.try_to_create_from_hash(condition.wait)
+      ensure
+        ch.close if ch
+      end
+
+      def load_cellulooid
+        require 'celluloid'
+        require 'celluloid/io'
       end
     end
   end

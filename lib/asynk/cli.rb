@@ -119,8 +119,8 @@ module Asynk
           end
 
           o.on '-V', '--version', "Print version and exit" do |arg|
-            puts "Sidekiq #{Sidekiq::VERSION}"
-            die(0)
+            puts "Asynk #{Asynk::VERSION}"
+            exit(0)
           end
         end
 

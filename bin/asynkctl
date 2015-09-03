@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+
+class Asynkctl
+  DEFAULT_KILL_TIMEOUT = 10
+
+  attr_reader :stage, :pidfile, :kill_timeout
+
+  def self.print_usage
+    puts "#{File.basename($0)} - stop a Asynk process from the command line."
+    puts
+    puts "Usage: #{File.basename($0)} <command> <pidfile> <kill_timeout>"
+    puts " where <command> is either 'quiet' or 'stop'"
+    puts "       <pidfile> is path to a pidfile"
+    puts "       <kill_timeout> is number of seconds to wait until Asynk exits"
+    puts "       (default: #{Asynkctl::DEFAULT_KILL_TIMEOUT}), after which Asynk will be KILL'd"
+    puts
+    puts "Be sure to set the kill_timeout LONGER than Asynk's -t timeout.  If you want"
+    puts "to wait 60 seconds for jobs to finish, use `Asynk -t 60` and `Asynkctl stop"
+    puts " path_to_pidfile 61`"
+    puts
+  end
+
+  def initialize(stage, pidfile, timeout)
+    @stage = stage
+    @pidfile = pidfile
+    @kill_timeout = timeout
+
+    done('No pidfile given', :error) if !pidfile
+    done("Pidfile #{pidfile} does not exist", :warn) if !File.exist?(pidfile)
+    done('Invalid pidfile content', :error) if pid == 0
+
+    fetch_process
+
+    begin
+      send(stage)
+    rescue NoMethodError
+      done "Invalid command: #{stage}", :error
+    end
+  end
+
+  def fetch_process
+    Process.getpgid(pid)
+  rescue Errno::ESRCH
+    done "Process doesn't exist", :error
+  end
+
+  def done(msg, error = nil)
+    puts msg
+    exit(exit_signal(error))
+  end
+
+  def exit_signal(error)
+    (error == :error) ? 1 : 0
+  end
+
+  def pid
+    @pid ||= File.read(pidfile).to_i
+  end
+
+  def quiet
+    Process.kill(:USR1, pid)
+  end
+
+  def stop
+    Process.kill(:TERM, pid)
+    kill_timeout.times do
+      begin
+        Process.getpgid(pid)
+      rescue Errno::ESRCH
+        FileUtils.rm_f pidfile
+        done 'Asynk shut down gracefully.'
+      end
+      sleep 1
+    end
+    Process.kill(:KILL, pid)
+    FileUtils.rm_f pidfile
+    done 'Asynk shut down forcefully.'
+  end
+  alias_method :shutdown, :stop
+end
+
+if ARGV.length < 2
+  Asynkctl.print_usage
+else
+  stage = ARGV[0]
+  pidfile = ARGV[1]
+  timeout = ARGV[2].to_i
+  timeout = Asynkctl::DEFAULT_KILL_TIMEOUT if timeout == 0
+
+  Asynkctl.new(stage, pidfile, timeout)
+end

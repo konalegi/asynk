@@ -53,15 +53,6 @@ module Asynk
       def concurrency
         @concurrency || Asynk.config[:default_consumer_concurrency]
       end
-
-      def set_sync(sync)
-        @sync = sync
-      end
-
-      def sync?
-        @sync || Asynk.config[:default_sync]
-      end
-
     end
   end
 end

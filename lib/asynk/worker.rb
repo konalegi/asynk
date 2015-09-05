@@ -7,7 +7,7 @@ module Asynk
       @consumer = consumer
       @ch = bunny_connection.create_channel
 
-      @default_exchange = @ch.default_exchange if @consumer.sync?
+      @default_exchange = @ch.default_exchange
 
       x = @ch.topic(Asynk.config[:mq_exchange])
       q = @ch.queue(consumer.queue_name, @consumer.queue_options)
@@ -19,8 +19,7 @@ module Asynk
               "                  mq_exchange:   #{Asynk.config[:mq_exchange]}",
               "                  queue_name:    #{@consumer.queue_name}",
               "                  queue_options: #{@consumer.queue_options}",
-              "                  routing_keys:  #{@consumer.routing_keys}",
-              "                  sync:          #{@consumer.sync?}"
+              "                  routing_keys:  #{@consumer.routing_keys}"
       ].join("\r\n")
     end
 

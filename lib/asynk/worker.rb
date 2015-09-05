@@ -25,14 +25,12 @@ module Asynk
 
     def on_event(delivery_info, properties, payload)
       message = Asynk::Message.new(delivery_info, properties, payload)
-      consumer_instance = @consumer.new(@ch, delivery_info)
-      Asynk.logger.info "Got Message: #{message}"
-      result = consumer_instance.process(message)
-      if @consumer.sync?
-        Asynk.logger.debug "Sending message back: #{result}"
-        result = Asynk::Response.new(status: :ok, body: result) unless result.kind_of?(Asynk::Response)
+      consumer_instance = @consumer.new(@ch, delivery_info) do |result|
+        Asynk.logger.debug "Sending message back: #{result.to_s}"
         @default_exchange.publish(result.to_json, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
       end
+      Asynk.logger.info "Got Message: #{message}"
+      consumer_instance.process(message)
     end
 
     def shutdown

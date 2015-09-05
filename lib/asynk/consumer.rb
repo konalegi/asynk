@@ -6,8 +6,10 @@ module Asynk
       Asynk.register_consumer(base)
     end
 
-    def initialize(channel, delivery_info)
-      @channel, @delivery_info = channel, delivery_info
+    def initialize(channel, delivery_info, &block)
+      @channel = channel
+      @delivery_info = delivery_info
+      @callback_block = block
     end
 
     def ack!
@@ -24,6 +26,10 @@ module Asynk
 
     def logger
       Asynk.logger
+    end
+
+    def respond(result)
+      @callback_block.call(result)
     end
 
     module ClassMethods

@@ -11,7 +11,7 @@ module Asynk
         logfile: 'log/asynk.log',
         pidifle: 'tmp/pids/asynk.pid',
         mq_host: 'localhost',
-        mq_port: 25672,
+        mq_port: 5672,
        mq_vhost: '/',
     mq_username: 'guest',
     mq_password: 'guest'

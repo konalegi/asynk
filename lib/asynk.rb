@@ -1,3 +1,4 @@
+require 'connection_pool'
 require 'singleton'
 require 'securerandom'
 require 'bunny'

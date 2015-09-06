@@ -16,6 +16,7 @@ Gem::Specification.new do |gem|
   gem.version       = Asynk::VERSION
   gem.add_dependency                  'celluloid', '~> 0.17.0'
   gem.add_dependency                  'celluloid-io'
+  gem.add_dependency                  'connection_pool'
   gem.add_dependency                  'activesupport'
   gem.add_dependency                  'json', '~> 1.0'
   gem.add_dependency                  'bunny'

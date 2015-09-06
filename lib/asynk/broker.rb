@@ -2,10 +2,6 @@
 
 module Asynk
   class Broker
-    # include Singleton
-
-    # def initialize
-    # end
     class << self
       def amqp_connection
         @amqp_connection ||= begin
@@ -14,10 +10,13 @@ module Asynk
                        username: Asynk.config[:mq_username],
                        password: Asynk.config[:mq_password],
                           vhost: Asynk.config[:mq_vhost])
-          p conn
           conn.start
           conn
         end
+      end
+
+      def pubisher_channel_pool
+        @connection_pool ||= ConnectionPool.new(size: 5, timeout: 10){ Asynk.broker.amqp_connection.create_channel }
       end
     end
 

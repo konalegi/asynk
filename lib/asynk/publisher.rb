@@ -23,6 +23,7 @@ module Asynk
             condition.signal(payload) if properties[:correlation_id] == call_id
           end
 
+          Asynk.logger.info "Sending message to #{routing_key} with params: #{params}"
           exchange.publish(params.to_json, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
           response = condition.wait(wait_timeout)
         end

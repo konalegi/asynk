@@ -4,6 +4,7 @@ module Asynk
       def publish(routing_key, params = {})
         Asynk.broker.pubisher_channel_pool.with do |channel|
           exchange = channel.topic(Asynk.config[:mq_exchange])
+          Asynk.logger.info "Sending asynk message to #{routing_key} with params: #{params}"
           exchange.publish(params.to_json, routing_key: routing_key)
         end
       end
@@ -23,7 +24,7 @@ module Asynk
             condition.signal(payload) if properties[:correlation_id] == call_id
           end
 
-          Asynk.logger.info "Sending message to #{routing_key} with params: #{params}"
+          Asynk.logger.info "Sending synk message to #{routing_key} with params: #{params}"
           exchange.publish(params.to_json, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
           response = condition.wait(wait_timeout)
         end

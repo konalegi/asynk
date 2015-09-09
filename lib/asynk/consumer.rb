@@ -39,6 +39,14 @@ module Asynk
         @routing_keys = routing_keys
       end
 
+      def set_route_ending_as_action(value)
+        @route_ending_as_action = value
+      end
+
+      def route_ending_as_action?
+        @route_ending_as_action || false
+      end
+
       def set_queue(name, options = {})
         @queue_name = name
         @queue_options = options

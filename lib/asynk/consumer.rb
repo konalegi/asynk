@@ -33,7 +33,7 @@ module Asynk
     end
 
     module ClassMethods
-      attr_reader :routing_keys, :queue_name, :subscribe_arguments, :queue_options
+      attr_reader :routing_keys, :subscribe_arguments, :queue_options
 
       def set_consume(*routing_keys)
         @routing_keys = routing_keys
@@ -47,9 +47,20 @@ module Asynk
         @route_ending_as_action || false
       end
 
-      def set_queue(name, options = {})
+      def set_queue_name(options = {})
         @queue_name = name
+      end
+
+      def set_queue_options(options = {})
         @queue_options = options
+      end
+
+      def queue_name
+        return @queue_name unless @queue_name.nil?
+        app_name = Rails.application.class.parent_name.dup.underscore if defined?(Rails)
+        queue_name = self.name.gsub(/::/, '.').underscore
+        queue_name = [app_name, queue_name].join('.') if app_name
+        queue_name
       end
 
       def set_subscribe_arguments(arguments = {})

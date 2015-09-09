@@ -6,6 +6,7 @@ PATH
       bunny
       celluloid (~> 0.17.0)
       celluloid-io
+      connection_pool
       json (~> 1.0)
 
 GEM
@@ -49,7 +50,7 @@ GEM
     amq-protocol (2.0.0)
     arel (6.0.3)
     builder (3.2.2)
-    bunny (2.1.0)
+    bunny (2.2.0)
       amq-protocol (>= 2.0.0)
     celluloid (0.17.1.2)
       bundler
@@ -80,9 +81,14 @@ GEM
       nenv
       rspec-logsplit (>= 0.1.2)
       timers (>= 4.1.1)
-    celluloid-io (0.16.2)
-      celluloid (>= 0.16.0)
-      nio4r (>= 1.1.0)
+    celluloid-io (0.17.1)
+      bundler
+      celluloid (>= 0.17.1.1)
+      dotenv
+      nenv
+      nio4r (>= 1.1)
+      rspec-logsplit (>= 0.1.2)
+      timers (>= 4.1.1)
     celluloid-pool (0.20.1)
       bundler
       dotenv
@@ -95,6 +101,7 @@ GEM
       nenv
       rspec-logsplit (>= 0.1.2)
       timers (>= 4.1.1)
+    connection_pool (2.2.0)
     dotenv (2.0.2)
     erubis (2.7.0)
     globalid (0.3.6)

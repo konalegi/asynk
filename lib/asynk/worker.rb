@@ -30,13 +30,9 @@ module Asynk
         @default_exchange.publish(result.to_json, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
       end
       Asynk.logger.info "Got Message: #{message}"
-      if @consumer.route_ending_as_action?
-        action = get_action_name_from_routing_key(message.routing_key)
-        consumer_instance.public_send(action.to_sym, message)
-      else
-        consumer_instance.process(message)
-      end
+      method_for_exec = @consumer.route_ending_as_action? ? get_action_name_from_routing_key(message.routing_key) : :process
 
+      consumer_instance.public_send(method_for_exec, message)
     end
 
     def shutdown
@@ -48,7 +44,7 @@ module Asynk
       def get_action_name_from_routing_key(routing_key)
         splitted = routing_key.split('.')
         raise 'There now action in routing_key' if splitted.empty? || splitted.count < 2
-        splitted.last
+        splitted.last.to_sym
       end
   end
 end

@@ -2,6 +2,7 @@ require 'connection_pool'
 require 'singleton'
 require 'securerandom'
 require 'bunny'
+require 'active_support'
 require 'asynk/config'
 require 'asynk/publisher'
 require 'asynk/broker'
@@ -12,6 +13,7 @@ require 'asynk/message'
 require 'asynk/response'
 
 module Asynk
+
   DEFAULTS = {
     require: '.',
     environment: nil

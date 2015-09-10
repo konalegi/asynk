@@ -3,6 +3,7 @@ module Asynk
 
     def self.included(base)
       base.extend(ClassMethods)
+      base.include ActiveSupport::Rescuable
       Asynk.register_consumer(base)
     end
 
@@ -32,6 +33,16 @@ module Asynk
       @callback_block.call(result)
     end
 
+    def invoke_processing(message)
+      method_for_exec = (self.class.route_ending_as_action? && message.routing_key) ? action_name_from_routing_key(message.routing_key) : :process
+
+      begin
+        public_send(method_for_exec, message)
+      rescue Exception => ex
+        rescue_with_handler(ex)
+      end
+    end
+
     module ClassMethods
       attr_reader :routing_keys, :subscribe_arguments, :queue_options
 
@@ -58,7 +69,7 @@ module Asynk
       def queue_name
         return @queue_name unless @queue_name.nil?
         app_name = Rails.application.class.parent_name.dup.underscore if defined?(Rails)
-        queue_name = self.name.gsub(/::/, '.').underscore
+        queue_name = ActiveSupport::Inflector.underscore(self.name.gsub(/::/, '.'))
         queue_name = [app_name, queue_name].join('.') if app_name
         queue_name
       end
@@ -74,6 +85,13 @@ module Asynk
       def concurrency
         @concurrency || Asynk.config[:default_consumer_concurrency]
       end
+
+      def action_name_from_routing_key(routing_key)
+        splitted = routing_key.split('.')
+        raise 'There now action in routing_key' if splitted.empty? || splitted.count < 2
+        splitted.last.to_sym
+      end
+
     end
   end
 end

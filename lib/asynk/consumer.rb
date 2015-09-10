@@ -34,7 +34,8 @@ module Asynk
     end
 
     def invoke_processing(message)
-      method_for_exec = (self.class.route_ending_as_action? && message.routing_key) ? action_name_from_routing_key(message.routing_key) : :process
+      method_for_exec = (self.class.route_ending_as_action? && message.routing_key) ?
+                          self.class.action_name_from_routing_key(message.routing_key) : :process
 
       begin
         public_send(method_for_exec, message)

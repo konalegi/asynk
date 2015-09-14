@@ -4,13 +4,13 @@ module Asynk
       def publish(routing_key, params = {})
         Asynk.broker.pubisher_channel_pool.with do |channel|
           exchange = channel.topic(Asynk.config[:mq_exchange])
-          Asynk.logger.info "Sending asynk message to #{routing_key} with params: #{params}"
-          exchange.publish(params.to_json, routing_key: routing_key)
+          Asynk::Benchmark.measure_around("Sending asynk message to #{routing_key} with params: #{params}") do
+            exchange.publish(params.to_json, routing_key: routing_key)
+          end
         end
       end
 
       def sync_publish(routing_key, params = {})
-        start_time = Time.now.to_f
         wait_timeout = params.delete(:timeout) || Asynk.config[:sync_publish_wait_timeout]
         load_cellulooid
         response = nil
@@ -25,10 +25,10 @@ module Asynk
             condition.signal(payload) if properties[:correlation_id] == call_id
           end
 
-          Asynk.logger.info "Sending synk message to #{routing_key} with params: #{params}"
-          exchange.publish(params.to_json, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
-          Asynk.logger.debug "Request round trip time: #{((Time.now.to_f - start_time)*1000).round(2)} ms"
-          response = condition.wait(wait_timeout)
+          Asynk::Benchmark.measure_around("Sending synk message to #{routing_key} with params: #{params}") do
+            exchange.publish(params.to_json, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
+            response = condition.wait(wait_timeout)
+          end
         end
         Asynk::Response.try_to_create_from_hash(response)
       end

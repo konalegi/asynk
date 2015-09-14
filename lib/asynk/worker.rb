@@ -24,14 +24,15 @@ module Asynk
     end
 
     def on_event(delivery_info, properties, payload)
+      start_time = Time.now.to_f
       message = Asynk::Message.new(delivery_info, properties, payload)
       consumer_instance = @consumer.new(@ch, delivery_info) do |result|
-        Asynk.logger.debug "Sending message back: #{result.to_s}"
+        Asynk.logger.debug "Sending message back: #{result.to_s}. Completed In: #{((Time.now.to_f - start_time)*1000).round(2)} ms."
         @default_exchange.publish(result.to_json, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
       end
-      consumer_instance.invoke_processing(message)
-      Asynk.logger.info "Got Message: #{message}"
 
+      Asynk.logger.info "Got Message: #{message}"
+      consumer_instance.invoke_processing(message)
     end
 
     def shutdown

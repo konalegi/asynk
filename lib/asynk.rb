@@ -11,6 +11,7 @@ require 'asynk/logger'
 require 'asynk/server'
 require 'asynk/message'
 require 'asynk/response'
+require 'asynk/benchmark'
 
 module Asynk
 

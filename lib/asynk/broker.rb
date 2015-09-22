@@ -19,7 +19,8 @@ module Asynk
       end
 
       def pubisher_channel_pool
-        @connection_pool ||= ConnectionPool.new(size: 5, timeout: 10){ Asynk.broker.amqp_connection.create_channel }
+        @connection_pool ||= ConnectionPool.new(size: Asynk.config[:mq_client_pool_size],
+          timeout: 10){ Asynk.broker.amqp_connection.create_channel }
       end
     end
 

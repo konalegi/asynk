@@ -14,7 +14,8 @@ module Asynk
         mq_port: 5672,
        mq_vhost: '/',
     mq_username: 'guest',
-    mq_password: 'guest'
+    mq_password: 'guest',
+    mq_client_pool_size: 5
 
       }
     end

@@ -31,10 +31,10 @@ module Asynk
           exchange.publish(params.to_json, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
           response = condition.wait(wait_timeout)
         end
-        # end
 
         Asynk::Response.try_to_create_from_hash(response)
       ensure
+        reply_queue.delete if reply_queue
         channel.close if channel
       end
 

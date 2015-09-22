@@ -6,6 +6,7 @@ module Asynk
       @instance_id = instance_id
       @consumer = consumer
       @ch = bunny_connection.create_channel
+      @ch.prefetch(1)
 
       @default_exchange = @ch.default_exchange
 
@@ -27,11 +28,12 @@ module Asynk
       start_time = Time.now.to_f
       message = Asynk::Message.new(delivery_info, properties, payload)
       consumer_instance = @consumer.new(@ch, delivery_info) do |result|
-        Asynk.logger.debug "Sending message back: #{result.to_s}. Completed In: #{((Time.now.to_f - start_time)*1000).round(2)} ms."
+        Asynk.logger.debug "#{@consumer.name}:#{@instance_id} Sending message back: #{result.to_s}. " +
+          "Completed In: #{((Time.now.to_f - start_time)*1000).round(2)} ms."
         @default_exchange.publish(result.to_json, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
       end
 
-      Asynk.logger.info "Got Message: #{message}"
+      Asynk.logger.info "#{@consumer.name}:#{@instance_id} Got Message: #{message}"
       consumer_instance.invoke_processing(message)
     end
 

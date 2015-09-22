@@ -11,6 +11,7 @@ module Asynk
       end
 
       def sync_publish(routing_key, params = {})
+        reply_queue = nil
         wait_timeout = params.delete(:timeout) || Asynk.config[:sync_publish_wait_timeout]
         load_cellulooid
         response = nil
@@ -30,6 +31,8 @@ module Asynk
             response = condition.wait(wait_timeout)
           end
         end
+        reply_queue.delete rescue Asynk.logger.error 'Cannot close reply queue.'
+
         Asynk::Response.try_to_create_from_hash(response)
       end
 

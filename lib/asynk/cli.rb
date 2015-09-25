@@ -34,20 +34,20 @@ module Asynk
         return unless options[:daemon]
 
         raise ArgumentError, "You really should set a logfile if you're going to daemonize" unless options[:logfile]
-        # files_to_reopen = []
-        # ObjectSpace.each_object(File) do |file|
-        #   files_to_reopen << file unless file.closed?
-        # end
+        files_to_reopen = []
+        ObjectSpace.each_object(File) do |file|
+          files_to_reopen << file unless file.closed?
+        end
 
         ::Process.daemon(true, true)
 
-        # files_to_reopen.each do |file|
-        #   begin
-        #     file.reopen file.path, "a+"
-        #     file.sync = true
-        #   rescue ::Exception
-        #   end
-        # end
+        files_to_reopen.each do |file|
+          begin
+            file.reopen file.path, "a+"
+            file.sync = true
+          rescue ::Exception
+          end
+        end
 
         [$stdout, $stderr].each do |io|
           File.open(options[:logfile], 'ab') do |f|

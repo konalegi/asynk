@@ -14,6 +14,8 @@ module Asynk
       { status: @status, body: @body, error_message: @error_message }
     end
 
+    def errors; @error_message; end
+
     def [](key)
       @body[key]
     end

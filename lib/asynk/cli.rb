@@ -9,6 +9,7 @@ module Asynk
     attr_accessor :environment
 
     def run(args=ARGV)
+      Asynk.booted_inside = true
       setup_options(args)
       boot_system
       daemonize

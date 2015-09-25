@@ -49,12 +49,14 @@ module Asynk
       Server.instance
     end
 
-    def broker
-      Broker
+    def broker; Broker; end
+
+    def booted_inside?; @booted_inside; end
+
+    def booted_inside=(value)
+      @booted_inside = value
     end
 
-    def config
-      Config.instance
-    end
+    def config; Config.instance; end
   end
 end

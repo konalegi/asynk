@@ -20,6 +20,11 @@ module Asynk
     private
 
       def load_celluloid
+        raise "Celluloid cannot be required until here, or it will break Sidekiq's daemonization" if defined?(::Celluloid) && options[:daemon]
+
+        # Celluloid can't be loaded until after we've daemonized
+        # because it spins up threads and creates locks which get
+        # into a very bad state if forked.
         require 'celluloid'
         require 'celluloid/io'
         Celluloid.logger = (options[:verbose] ? Asynk.logger : nil)

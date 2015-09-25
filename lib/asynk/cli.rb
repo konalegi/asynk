@@ -11,6 +11,7 @@ module Asynk
     def run(args=ARGV)
       Asynk.booted_inside = true
       setup_options(args)
+      initialize_logger
       boot_system
       daemonize
       load_celluloid

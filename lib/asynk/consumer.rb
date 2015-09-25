@@ -40,7 +40,7 @@ module Asynk
       begin
         public_send(method_for_exec, message)
       rescue Exception => ex
-        rescue_with_handler(ex)
+        raise(ex) unless rescue_with_handler(ex)
       end
     end
 

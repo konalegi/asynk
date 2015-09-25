@@ -7,7 +7,7 @@ require 'asynk/config'
 require 'asynk/publisher'
 require 'asynk/broker'
 require 'asynk/consumer'
-require 'asynk/logger'
+require 'asynk/logging'
 require 'asynk/server'
 require 'asynk/message'
 require 'asynk/response'
@@ -38,7 +38,11 @@ module Asynk
     end
 
     def logger
-      Logger.instance
+      Asynk::Logging.logger
+    end
+
+    def logger=(log)
+      Asynk::Logging.logger = log
     end
 
     def server

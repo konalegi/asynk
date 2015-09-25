@@ -22,6 +22,7 @@ module Asynk
       def load_celluloid
         require 'celluloid'
         require 'celluloid/io'
+        Celluloid.logger = (options[:verbose] ? Asynk.logger : nil)
       end
 
       def daemonize
@@ -51,7 +52,7 @@ module Asynk
         end
         $stdin.reopen('/dev/null')
 
-        # initialize_logger
+        initialize_logger
       end
 
       def write_pid
@@ -63,10 +64,13 @@ module Asynk
         end
       end
 
-
-
       def options
         Asynk.options
+      end
+
+      def initialize_logger
+        Asynk::Logging.initialize_logger(options[:logfile]) if options[:logfile]
+        Asynk.logger.level = ::Logger::DEBUG if options[:verbose]
       end
 
       def setup_options(args)
@@ -121,6 +125,10 @@ module Asynk
           o.on '-V', '--version', "Print version and exit" do |arg|
             puts "Asynk #{Asynk::VERSION}"
             exit(0)
+          end
+
+          o.on "-v", "--verbose", "Print more verbose output" do |arg|
+            opts[:verbose] = arg
           end
         end
 

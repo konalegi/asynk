@@ -30,7 +30,7 @@ module Asynk
       consumer_instance = @consumer.new(@ch, delivery_info) do |result|
         Asynk.logger.debug "#{@consumer.name}:#{@instance_id} Sending message back: #{result.to_s}. " +
           "Completed In: #{((Time.now.to_f - start_time)*1000).round(2)} ms."
-        @default_exchange.publish(result.to_json, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
+        @default_exchange.publish(convert_to_valid_json_string(result), routing_key: properties.reply_to, correlation_id: properties.correlation_id)
       end
 
       Asynk.logger.info "#{@consumer.name}:#{@instance_id} Got Message: #{message}"
@@ -43,6 +43,10 @@ module Asynk
     end
 
     private
+      def convert_to_valid_json_string(data)
+        data = '' if data.nil?
+        data.is_a?(String) ? data : data.to_json
+      end
 
   end
 end

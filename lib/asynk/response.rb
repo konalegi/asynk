@@ -14,6 +14,10 @@ module Asynk
       { status: @status, body: @body, error_message: @error_message }
     end
 
+    def status
+      ActiveSupport::StringInquirer.new(@status)
+    end
+
     def errors; @error_message; end
 
     def [](key)

@@ -11,13 +11,20 @@ module Asynk
       bunny_mock_properties = BuunyMockedProperties.new
 
       message = Asynk::Message.new(bunny_mocked_delivery_info, bunny_mock_properties, options.to_json)
-      asynk_result = nil
       consumer_instance = consumer.new(bunny_mocked_channel, bunny_mocked_delivery_info) do |result|
-        asynk_result = result.kind_of?(String) ? result : result.to_json
+        self.asynk_response = result.kind_of?(String) ? result : result.to_json
       end
 
       consumer_instance.invoke_processing(message)
-      asynk_result
+      asynk_response
+    end
+
+    def asynk_response=(response)
+      @asynk_response = response
+    end
+
+    def asynk_response
+      @asynk_response
     end
 
     def find_consumers_by_route(route)
@@ -25,15 +32,16 @@ module Asynk
     end
 
     class BunnyMockedChannel
-      def ack!(*args); end
-      def reject!(*args); end
-      def retry!(*args); end
+      def ack(*args); end
+      def reject(*args); end
+      def retry(*args); end
     end
 
     class BuunyMockedDeliveryInfo
       attr_reader :routing_key
       def initialize(routing_key); @routing_key = routing_key; end
       def exchange; end
+      def delivery_tag; end
     end
 
     class BuunyMockedProperties

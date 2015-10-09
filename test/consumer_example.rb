@@ -1,14 +1,31 @@
 class WalletEventsConsumer
   include Asynk::Consumer
 
-  set_consume 'gm_backend.wallet.registration_completed'
+  set_consume 'sample_app.wallet.registration_completed'
   set_queue_options durable: true, ack: true
   set_subscribe_arguments manual_ack: true
-  set_concurrency 2
+  set_concurrency 1
+  set_route_ending_as_action true
 
-  rescue_from ArgumentError, with: :handle_argument_error
-  rescue_from "Exception", with: :handle_exception
+  def registration_completed(message)
+    respond(message.body)
+  end
+end
 
-  def process
+class LogEventsConsumer
+  include Asynk::Consumer
+
+  set_consume 'sample_app.logs.warn', 'sample_app.logs.info'
+  set_queue_options durable: true, ack: true
+  set_subscribe_arguments manual_ack: true
+  set_concurrency 1
+  set_route_ending_as_action true
+
+  def warn(message)
+    respond(message.body)
+  end
+
+  def info(message)
+    respond(message.body)
   end
 end

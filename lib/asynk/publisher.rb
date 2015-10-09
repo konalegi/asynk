@@ -42,12 +42,15 @@ module Asynk
         message = Asynk::Response.try_to_create_from_hash(response)
 
         if Asynk.config[:publisher_execution_time]
-          Asynk.logger.info "Sending sync message  #{routing_key}:#{message_id} to  with params: #{params}. Completed In: #{publish_time} ms."
+          Asynk.logger.info "Sending sync message to #{routing_key}:#{message_id} with params: #{params}. Completed In: #{publish_time} ms."
         end
 
         Asynk.logger.debug("Response: #{message}")
 
         message
+      rescue Celluloid::ConditionError => ex
+        Asynk.logger.error "Sending sync message to #{routing_key}:#{message_id} with params: #{params} completed with Timout: #{wait_timeout}"
+        raise
       ensure
         reply_queue.delete if reply_queue
         channel.close if channel

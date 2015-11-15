@@ -21,8 +21,8 @@ module Asynk
       @channel.reject(@delivery_info.delivery_tag)
     end
 
-    def retry!
-      @channel.retry(@delivery_info.delivery_tag)
+    def requeue!
+      @channel.reject(@delivery_info.delivery_tag, true)
     end
 
     def logger

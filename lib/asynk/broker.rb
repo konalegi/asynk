@@ -3,7 +3,7 @@
 module Asynk
   class Broker
     class << self
-      def amqp_connection
+      def connect
         @amqp_connection ||= begin
           conn = Bunny.new(host: Asynk.config[:mq_host],
                            port: Asynk.config[:mq_port],
@@ -17,6 +17,8 @@ module Asynk
           conn
         end
       end
+
+      def amqp_connection; @amqp_connection; end
     end
   end
 end

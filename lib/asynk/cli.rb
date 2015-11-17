@@ -12,9 +12,9 @@ module Asynk
       Asynk.booted_inside = true
       setup_options(args)
       initialize_logger
-      boot_system
       daemonize
       load_celluloid
+      boot_system
       write_pid
       Asynk.server.run
     end

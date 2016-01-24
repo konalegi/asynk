@@ -31,7 +31,11 @@ module Asynk
         call_id = SecureRandom.uuid
 
         reply_queue.subscribe do |delivery_info, properties, payload|
-          condition.signal(payload) if properties[:correlation_id] == call_id
+          if properties[:correlation_id] == call_id
+            condition.signal(payload)
+          else
+            Asynk.logger.error("Message with id: #{message_id} received with error. Waiting for #{call_id} but was #{properties[:correlation_id]}")
+          end
         end
 
         publish_time = Asynk::Benchmark.measure_around do
@@ -45,7 +49,7 @@ module Asynk
           Asynk.logger.info "Sending sync message to #{routing_key}:#{message_id} with params: #{params}. Completed In: #{publish_time} ms."
         end
 
-        Asynk.logger.debug("Response: #{message}")
+        Asynk.logger.debug("Response: #{message.inspect}")
 
         message
       rescue Celluloid::ConditionError => ex

@@ -25,6 +25,7 @@ module Asynk
 
         channel = Asynk.broker.amqp_connection.create_channel
         exchange = channel.topic(Asynk.config[:mq_exchange])
+        channel.confirm_select
 
         reply_queue = channel.queue('', exclusive: true)
 

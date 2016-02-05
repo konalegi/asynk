@@ -27,12 +27,17 @@ module Asynk
         exchange = channel.topic(Asynk.config[:mq_exchange])
 
         reply_queue = channel.queue('', exclusive: true)
-        condition = Celluloid::Condition.new
+
+        lock      = Mutex.new
+        condition = ConditionVariable.new
+
         call_id = SecureRandom.uuid
 
         reply_queue.subscribe do |delivery_info, properties, payload|
+          Asynk.logger.info("Message with id: #{message_id} received. #{call_id}, #{properties[:correlation_id]}")
           if properties[:correlation_id] == call_id
-            condition.signal(payload)
+            response = payload
+            lock.synchronize{condition.signal}
           else
             Asynk.logger.error("Message with id: #{message_id} received with error. Waiting for #{call_id} but was #{properties[:correlation_id]}")
           end
@@ -40,7 +45,7 @@ module Asynk
 
         publish_time = Asynk::Benchmark.measure_around do
           exchange.publish(params.to_json, message_id: message_id, routing_key: routing_key, correlation_id: call_id, reply_to: reply_queue.name)
-          response = condition.wait(wait_timeout)
+          lock.synchronize{condition.wait(lock, wait_timeout)}
         end
 
         message = Asynk::Response.try_to_create_from_hash(response)
@@ -49,7 +54,7 @@ module Asynk
           Asynk.logger.info "Sending sync message to #{routing_key}:#{message_id} with params: #{params}. Completed In: #{publish_time} ms."
         end
 
-        Asynk.logger.debug("Response: #{message.inspect}")
+        Asynk.logger.debug("Response for #{routing_key}:#{message_id}: #{message.inspect}")
 
         message
       rescue Celluloid::ConditionError => ex

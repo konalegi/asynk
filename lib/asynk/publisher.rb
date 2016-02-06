@@ -35,7 +35,6 @@ module Asynk
         call_id = SecureRandom.uuid
 
         reply_queue.subscribe do |delivery_info, properties, payload|
-          Asynk.logger.info("Message with id: #{message_id} received. #{call_id}, #{properties[:correlation_id]}")
           if properties[:correlation_id] == call_id
             response = payload
             lock.synchronize{condition.signal}

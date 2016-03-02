@@ -13,9 +13,9 @@ module Asynk
       setup_options(args)
       initialize_logger
       daemonize
+      write_pid
       load_celluloid
       boot_system
-      write_pid
       Asynk.server.run
     end
 

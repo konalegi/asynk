@@ -18,6 +18,11 @@ module Asynk
         end
       end
 
+      def disconnect
+        @amqp_connection.close if @amqp_connection
+        @amqp_connection = nil
+      end
+
       def amqp_connection; @amqp_connection; end
     end
   end

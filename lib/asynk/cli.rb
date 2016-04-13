@@ -87,7 +87,7 @@ module Asynk
       end
 
       def boot_system
-        Asynk.logger.info 'Booting rails app'
+        Asynk.logger.info 'Booting Asynk App'
         ENV['RACK_ENV'] = ENV['RAILS_ENV'] = environment
 
         raise ArgumentError, "#{options[:require]} does not exist" unless File.exist?(options[:require])

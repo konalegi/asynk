@@ -22,7 +22,6 @@ module Asynk
       def sync_publish(routing_key, params = {})
         message_id = params.delete(:message_id) || generate_message_id
         wait_timeout = params.delete(:timeout) || Asynk.config[:sync_publish_wait_timeout]
-        load_cellulooid
         response = nil
 
         channel = Asynk.broker.amqp_connection.create_channel
@@ -69,11 +68,6 @@ module Asynk
       ensure
         reply_queue.delete if reply_queue
         channel.close if channel
-      end
-
-      def load_cellulooid
-        require 'celluloid'
-        require 'celluloid/io'
       end
 
       def generate_message_id

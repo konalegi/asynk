@@ -11,10 +11,10 @@ module Asynk
       @default_exchange = @ch.default_exchange
 
       x = @ch.topic(Asynk.config[:mq_exchange])
-      q = @ch.queue(consumer.queue_name, @consumer.queue_options)
+      q = @ch.queue(consumer.queue_name, @consumer.queue_options || {})
 
       @consumer.routing_keys.each{ |routing_key| q.bind(x, routing_key: routing_key) }
-      q.subscribe(@consumer.subscribe_arguments, &method(:on_event))
+      q.subscribe(@consumer.subscribe_arguments || {}, &method(:on_event))
 
       Asynk.logger.info ["#{@consumer.name}:#{@instance_id} worker accepting connections. ",
               "                  mq_exchange:   #{Asynk.config[:mq_exchange]}",

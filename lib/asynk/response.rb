@@ -28,6 +28,10 @@ module Asynk
       to_h
     end
 
+    def to_json
+      to_h.to_json
+    end
+
     alias_method :to_s, :to_h
     alias_method :as_json, :to_h
     alias_method :inspect, :to_s

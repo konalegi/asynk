@@ -12,6 +12,7 @@ require 'asynk/server'
 require 'asynk/message'
 require 'asynk/response'
 require 'asynk/benchmark'
+require 'asynk/sync_publisher'
 require 'asynk/test_helper'
 
 module Asynk

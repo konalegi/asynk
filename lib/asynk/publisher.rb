@@ -4,19 +4,16 @@ module Asynk
 
     class << self
       def publish(routing_key, params = {})
+        global_start_time = Asynk::Benchmark.start if Asynk.config[:publisher_execution_time]
         message_id = params.delete(:message_id) || generate_message_id
-        channel = Asynk.broker.amqp_connection.create_channel
-        exchange = channel.topic(Asynk.config[:mq_exchange])
-        publish_time = Asynk::Benchmark.measure_around do
+
+        Asynk.broker.pool.with do |channel, exchange, reply_queue|
           exchange.publish(params.to_json, message_id: message_id, routing_key: routing_key)
         end
 
         if Asynk.config[:publisher_execution_time]
-          Asynk.logger.info "Sending async message #{routing_key}:#{message_id} with params: #{params}. Completed In: #{publish_time} ms."
+          Asynk.logger.info "Sending async message #{routing_key}:#{message_id} with params: #{params}. Completed In: #{Asynk::Benchmark.end(global_start_time)} ms."
         end
-
-      ensure
-        channel.close if channel
       end
 
       def sync_publish(routing_key, params = {})

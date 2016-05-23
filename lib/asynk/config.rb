@@ -16,7 +16,8 @@ module Asynk
                       mq_username: 'guest',
                       mq_password: 'guest',
           publisher_execution_time: true,
-       respond_back_execution_time: true
+       respond_back_execution_time: true,
+                ignored_consumers: []
       }
     end
 

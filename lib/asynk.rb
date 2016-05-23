@@ -24,6 +24,7 @@ module Asynk
 
   class << self
     def register_consumer(consumer)
+      return if Asynk.config[:ignored_consumers].include? consumer.name
       self.consumers << consumer
     end
 

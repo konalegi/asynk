@@ -58,21 +58,21 @@ end
 ```
 
 Firstly you should define Class, and include Asynk::Consumer.
-  set_consume - list of topics to consume
-  set_queue_options - set for options which created after server intialized
-  set_subscribe_arguments - set options which passed to when subscribing queue to exchange
-  set_concurrency - amount of workers which will consume for each consumer
-  set_route_ending_as_action - this options defines, that last item of consume topic is used as method name (ex: sample_app.v1.users.show, last item show, will be called in this class.)
+  * set_consume - list of topics to consume
+  * set_queue_options - set for options which created after server intialized
+  * set_subscribe_arguments - set options which passed to when subscribing queue to exchange
+  * set_concurrency - amount of workers which will consume for each consumer
+  * set_route_ending_as_action - this options defines, that last item of consume topic is used as method name (ex: sample_app.v1.users.show, last item show, will be called in this class.)
 
 Also, after instance creation, has several methods,
-  log - logger object for sending logs for default Logger of Asynk.
-  ack!, reject!, requeue! - methods is used for handling messages, if you want manually work with ackonaldgments
+  * log - logger object for sending logs for default Logger of Asynk.
+  * ack!, reject!, requeue! - methods is used for handling messages, if you want manually work with ackonaldgments
 
 
 
 After declaring consumer, now you can send some request using default Asynk::Publisher, it has two options:
-  sync_publish - synchronous sending of message, and waiting for response from consumer. You should define timeouts, if consumers crashes it never receives a             message. timeout - says the amount of time in seconds for waiting message, if timeout reaches it sends TimeoutError.
-  publish - just sending message, and forgets about it.
+  * sync_publish - synchronous sending of message, and waiting for response from consumer. You should define timeouts, if consumers crashes it never receives a             message. timeout - says the amount of time in seconds for waiting message, if timeout reaches it sends TimeoutError.
+  * publish - just sending message, and forgets about it.
 
 ```ruby
   # here sending synchronous messages

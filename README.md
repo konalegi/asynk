@@ -4,8 +4,8 @@ Asynk is a Ruby library for enabling synchronous/asynchronous inter-service comm
 
 # Overview
 
-It's takes concepts of ruby gem called Hutch, but using Cellouid under hood for creating workers for processing queues, which requires significant memory requirments.
-Also as limitation of ruby you cannot make heavy computations in ruby and gather true concurency. Async offers synchronous calls (RPC).
+It's takes concepts of ruby gem called Hutch, but using Cellouid under hood for creating workers for processing queues, which requires significant memory requirements.
+Also as limitation of ruby you cannot make heavy computations in ruby and gather true concurrency. Asynk offers synchronous calls (RPC).
 
 ## Installation
 
@@ -19,7 +19,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install endive
+    $ gem install asynk
 
 ## Usage
 
@@ -41,7 +41,7 @@ class V1::PaymentOrdersConsumer
   def notifications(params)    
     # do here some works
   ensure
-    ack! # required if you manually processing acknolagments, available methods reject!, requeue!
+    ack! # required if you manually processing acknowledgments, available methods reject!, requeue!
   end
 
   # example for handling synchronous request
@@ -58,21 +58,21 @@ end
 ```
 
 Firstly you should define Class, and include Asynk::Consumer.
-  * set_consume - list of topics to consume
-  * set_queue_options - set for options which created after server intialized
-  * set_subscribe_arguments - set options which passed to when subscribing queue to exchange
-  * set_concurrency - amount of workers which will consume for each consumer
-  * set_route_ending_as_action - this options defines, that last item of consume topic is used as method name (ex: sample_app.v1.users.show, last item show, will be called in this class.)
+  * `set_consume` list of topics to consume
+  * `set_queue_options` set for options which created after server initialized
+  * `set_subscribe_arguments` set options which passed to when subscribing queue to exchange
+  * `set_concurrency` amount of workers which will consume for each consumer
+  * `set_route_ending_as_action` this options defines, that last item of consume topic is used as method name (ex: sample_app.v1.users.show, last item show, will be called in this class.)
 
 Also, after instance creation, has several methods,
-  * log - logger object for sending logs for default Logger of Asynk.
-  * ack!, reject!, requeue! - methods is used for handling messages, if you want manually work with ackonaldgments
+  * `log` logger object for sending logs for default Logger of Asynk.
+  * `ack!`, `reject!`, `requeue!`  methods is used for handling messages, if you want manually work with acknowledgments
 
 
 
 After declaring consumer, now you can send some request using default Asynk::Publisher, it has two options:
-  * sync_publish - synchronous sending of message, and waiting for response from consumer. You should define timeouts, if consumers crashes it never receives a             message. timeout - says the amount of time in seconds for waiting message, if timeout reaches it sends TimeoutError.
-  * publish - just sending message, and forgets about it.
+  * `sync_publish` synchronous sending of message, and waiting for response from consumer. You should define timeouts, if consumers crashes it never receives a             message. timeout - says the amount of time in seconds for waiting message, if timeout reaches it sends TimeoutError.
+  * `publish` just sending message, and forgets about it.
 
 ```ruby
   # here sending synchronous messages
@@ -81,8 +81,6 @@ After declaring consumer, now you can send some request using default Asynk::Pub
   # here sending asynchronous messages
   Asynk::Publisher.publish('sample_app.v1.users.notifications', { name: 'Tom', surname: 'Lane' })
 ```
-
-Library is made for interconnection for between microservices, it's highly recomended to use only asynchronous methods. If you making synchronous requests during any client request, it's bad design. Is you need some data from another microservice, just copy to your local store with eventually consistency.
 
 
 Asynk is using pool for channels for receiving and sending messages.
@@ -110,6 +108,56 @@ else
 end
 
 ```
+## Config options
+* `mq_exchange` exchange to use for publishing (`default` 'asynk_exchange_topic')
+* `sync_publish_wait_timeout` time to wait for sync requests. If timeout reaches, the timeout raised. (`default` 10 seconds)
+* `default_consumer_concurrency` numbers of workers to start per consumer (`default` 1)
+* `logfile` log file for default logger of asynk (`default` 'log/asynk.log')
+* `pidifle`  Asynk consumers is running on different process, this file is used to store pid file (`default` 'tmp/pids/asynk.pid')
+* `mq_host`  host for connection to broker (RabbitMQ) (`default` 'localhost')
+* `mq_port`  port for connection to broker (RabbitMQ) (`default` 5672)
+* `mq_vhost` vhost for connection to broker (RabbitMQ) (`default` '/')
+* `mq_username` username for connection to broker (RabbitMQ) (`default` 'guest')
+* `mq_password` password for connection to broker (RabbitMQ) (`default` 'guest')
+* `publisher_execution_time` used for profiling time to send when using Asynk::Publisher (`default` true)
+* `respond_back_execution_time` used for profiling time used for processing sync response (`default` true)
+* `ignored_consumers` this parameter used for disabling unused consumers as array of strings with consumer class names(`default` [])
+
+
+# Testing your consumers
+Firstly you should include `Asynk::TestHelper` to your test class, and then call  publish `sync_publish` method for sending request, if this is rpc call,
+invoke the asynk_response method for getting response.
+
+Example using with Rails and MiniTest.
+```ruby
+  # test_helper.rb
+  class ActiveSupport::TestCase
+    # include the test helper.  
+    include Asynk::TestHelper
+
+    # wrapping the response with Asynk::Response class, otherwise it will be just string value.
+    def asynk_response
+      Asynk::Response.try_to_create_from_hash(super)
+    end
+  end
+
+
+  # some_consumer_test.rb  
+
+  test 'should show profile' do
+    publish_sync 'some_route', { name: 'Chris' }
+
+    assert asynk_response.success? # testing for status of the response
+    assert asynk_response[:unread_messages] # testing the returned data
+    assert asynk_response[:unread_message_count]    
+  end
+```
+
+## Known problems
+
+* Poor documentation (source are poorly documented)
+* Poor test coverage (there are almost no test)
+* RPC calls implementation. Currently is implemented as continues loop, which tries get data from reply queue. Before it was implemented using Mutex, which caused huge time usage on handling them. I am not sure that current implementation is correct, but is id much faster in current tests. (On my machine 1-2 ms vs 7-8 ms).
 
 ## Contributing
 

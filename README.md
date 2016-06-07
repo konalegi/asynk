@@ -125,7 +125,7 @@ end
 
 
 # Testing your consumers
-Firstly you should include `Asynk::TestHelper` to your test class, and then call  publish `sync_publish` method for sending request, if this is rpc call,
+Firstly you should include `Asynk::TestHelper` to your test class, and then call `sync_publish` method for sending request, if this is rpc call,
 invoke the asynk_response method for getting response.
 
 Example using with Rails and MiniTest.

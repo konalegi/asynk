@@ -152,6 +152,28 @@ Example using with Rails and MiniTest.
     assert asynk_response[:unread_message_count]    
   end
 ```
+## Disabling consumers
+If you have application that have multiple different consumers, you can disable some of them by setting ignored_consumers parameter.
+
+For example, if you have application that implement media file processing consumers - TranscodeVideoConsumer, ResizeImageConsumer, CutAudioConsumer and you want one server only to transcode video files.
+
+You have to set ignored_consumers parameter before connecting to server
+
+```ruby
+Asynk.config[:ignored_consumers] = ['ResizeImageConsumer', 'CutAudioConsumer']
+```
+
+Also you can set ignored consumers in string environment variable
+
+```bash
+export IGNORED_CONSUMERS=ResizeImageConsumer,CutAudioConsumer
+```
+
+and then in Asynk initializer
+
+```ruby
+Asynk.config[:ignored_consumers] = ENV['IGNORED_CONSUMERS'].delete(' ').split(',') if ENV['IGNORED_CONSUMERS']
+```
 
 ## Known problems
 

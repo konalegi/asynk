@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency                  'celluloid', '~> 0.17'
   gem.add_dependency                  'celluloid-io', '~> 0.17'
   gem.add_dependency                  'connection_pool', '~> 2.2'
-  gem.add_dependency                  'activesupport', '~> 4.2'
+  gem.add_dependency                  'activesupport', '>= 4.2'
   gem.add_dependency                  'json', '~> 1.0'
   gem.add_dependency                  'bunny', '~> 2.3'
   gem.add_development_dependency      'minitest', '~> 5.7', '>= 5.7.0'

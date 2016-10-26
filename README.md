@@ -155,7 +155,7 @@ Example using with Rails and MiniTest.
 ## Disabling consumers
 If you have application that have multiple different consumers, you can disable some of them by setting ignored_consumers parameter.
 
-For example, if you have application that implement media file processing consumers - TranscodeVideoConsumer, ResizeImageConsumer, CutAudioConsumer and you want one server only to transcode video files.
+For example, if you have application that implements media file processing consumers - TranscodeVideoConsumer, ResizeImageConsumer, CutAudioConsumer and you want one server only to transcode video files.
 
 You have to set ignored_consumers parameter before connecting to server
 

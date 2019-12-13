@@ -28,17 +28,17 @@ Firstly you should define consumer, Example of consumer
 
 ```ruby
 class V1::PaymentOrdersConsumer
-  include Asynk::Consumer  
+  include Asynk::Consumer
 
   set_consume 'sample_app.v1.users.create', 'sample_app.v1.users.notifications'
 
   set_queue_options ack: true
   set_subscribe_arguments manual_ack: true
   set_concurrency 2
-  set_route_ending_as_action true  
+  set_route_ending_as_action true
 
   # handling asynchronous request from amqp
-  def notifications(params)    
+  def notifications(params)
     # do here some works
   ensure
     ack! # required if you manually processing acknowledgments, available methods reject!, requeue!
@@ -132,7 +132,7 @@ Example using with Rails and MiniTest.
 ```ruby
   # test_helper.rb
   class ActiveSupport::TestCase
-    # include the test helper.  
+    # include the test helper.
     include Asynk::TestHelper
 
     # wrapping the response with Asynk::Response class, otherwise it will be just string value.
@@ -142,14 +142,14 @@ Example using with Rails and MiniTest.
   end
 
 
-  # some_consumer_test.rb  
+  # some_consumer_test.rb
 
   test 'should show profile' do
     publish_sync 'some_route', { name: 'Chris' }
 
     assert asynk_response.success? # testing for status of the response
     assert asynk_response[:unread_messages] # testing the returned data
-    assert asynk_response[:unread_message_count]    
+    assert asynk_response[:unread_message_count]
   end
 ```
 ## Disabling consumers
@@ -188,3 +188,5 @@ Asynk.config[:ignored_consumers] = ENV['IGNORED_CONSUMERS'].delete(' ').split(',
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+sdasdasd
